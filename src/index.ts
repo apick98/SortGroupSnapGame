@@ -4,20 +4,12 @@ import Player from "./player";
 function main(): void {
     const numOfDecks: number = 1;
     let deck: Card[] = createDeck(numOfDecks);
+    deck = shuffleDeck(deck);
+
     let players: Player[] = [new Player('Player 1'), new Player('Player 2')];
     
     deck = dealCards(deck, players).deck;
-    players = dealCards(deck, players).players;
-
-    // console.log(players[0].hand.length)
-    // console.log(players[1].hand.length)
-
-    // console.log(deck.length)
-    
-    // for (let card of deck){
-    //     console.log(card);
-    // }
-    
+    players = dealCards(deck, players).players;    
 }
 
 function dealCards(deck: Card[], players: Player[]): { deck: Card[], players: Player[] } {
@@ -33,6 +25,21 @@ function dealCards(deck: Card[], players: Player[]): { deck: Card[], players: Pl
     }
 
     return { deck, players };
+}
+
+// Converted from Mike Bostock's JavaScript algorithm of the Fisher–Yates Shuffle - https://bost.ocks.org/mike/shuffle/
+function shuffleDeck(deck: Card[]): Card[] {
+    let m = deck.length;
+    let t, i;
+
+    while (m) {
+        i = Math.floor(Math.random() * m--);
+        t = deck[m];
+        deck[m] = deck[i];
+        deck[i] = t;
+    }
+
+    return deck;
 }
 
 function createDeck(numOfDecks: number = 1): Card[] {

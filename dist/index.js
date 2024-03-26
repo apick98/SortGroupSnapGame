@@ -8,13 +8,13 @@ const player_1 = __importDefault(require("./player"));
 function main() {
     const numOfDecks = 1;
     let deck = createDeck(numOfDecks);
+    deck = shuffleDeck(deck);
     let players = [new player_1.default('Player 1'), new player_1.default('Player 2')];
     deck = dealCards(deck, players).deck;
     players = dealCards(deck, players).players;
     console.log(players[0].hand.length);
     console.log(players[1].hand.length);
-    console.log(deck.length);
-    for (let card of deck) {
+    for (let card of players[0].hand) {
         console.log(card);
     }
 }
@@ -29,6 +29,17 @@ function dealCards(deck, players) {
         }
     }
     return { deck, players };
+}
+function shuffleDeck(deck) {
+    let m = deck.length;
+    let t, i;
+    while (m) {
+        i = Math.floor(Math.random() * m--);
+        t = deck[m];
+        deck[m] = deck[i];
+        deck[i] = t;
+    }
+    return deck;
 }
 function createDeck(numOfDecks = 1) {
     let suits = ['Clubs', 'Diamonds', 'Hearts', 'Spades'];
