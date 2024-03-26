@@ -8,6 +8,9 @@ class Player {
     addCardToHand(card) {
         this.hand.push(card);
     }
+    removeCardFromHand() {
+        return this.hand.shift();
+    }
 }
 exports.default = Player;
 //# sourceMappingURL=player.js.map

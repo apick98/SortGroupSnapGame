@@ -12,6 +12,10 @@ class Player{
   addCardToHand(card: Card) {
     this.hand.push(card);
   }
+
+  removeCardFromHand(): Card | undefined{
+    return this.hand.shift();
+  }
 }
 
 export default Player;

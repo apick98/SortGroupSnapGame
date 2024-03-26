@@ -7,16 +7,23 @@ const card_1 = __importDefault(require("./card"));
 const player_1 = __importDefault(require("./player"));
 function main() {
     const numOfDecks = 1;
-    let deck = createDeck(numOfDecks);
-    deck = shuffleDeck(deck);
-    let players = [new player_1.default('Player 1'), new player_1.default('Player 2')];
-    deck = dealCards(deck, players).deck;
-    players = dealCards(deck, players).players;
+    const numOfPlayers = 2;
+    const numOfRounds = 5;
+    let deck = shuffleDeck(createDeck(numOfDecks));
+    const { deck: table, players: players } = dealCards(deck, createPlayers(numOfPlayers));
+    let roundIndex = 0;
+    while (players.every(player => player.hand.length > 0) && roundIndex < numOfRounds) {
+        for (let player of players) {
+            let cardForTable = player.removeCardFromHand();
+            if (cardForTable) {
+                table.push(cardForTable);
+            }
+        }
+        roundIndex++;
+    }
     console.log(players[0].hand.length);
     console.log(players[1].hand.length);
-    for (let card of players[0].hand) {
-        console.log(card);
-    }
+    console.log(table.length);
 }
 function dealCards(deck, players) {
     const cardsToLeaveOnTable = deck.length % players.length;
@@ -29,6 +36,13 @@ function dealCards(deck, players) {
         }
     }
     return { deck, players };
+}
+function createPlayers(numOfPlayers) {
+    let playersToAdd = [];
+    for (let i = 0; i < numOfPlayers; i++) {
+        playersToAdd.push(new player_1.default('Player ' + i));
+    }
+    return playersToAdd;
 }
 function shuffleDeck(deck) {
     let m = deck.length;

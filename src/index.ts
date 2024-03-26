@@ -3,13 +3,30 @@ import Player from "./player";
 
 function main(): void {
     const numOfDecks: number = 1;
-    let deck: Card[] = createDeck(numOfDecks);
-    deck = shuffleDeck(deck);
-
-    let players: Player[] = [new Player('Player 1'), new Player('Player 2')];
+    const numOfPlayers: number = 2;
+    const numOfRounds: number = 5;
     
-    deck = dealCards(deck, players).deck;
-    players = dealCards(deck, players).players;    
+    let deck: Card[] = shuffleDeck(createDeck(numOfDecks));
+    const { deck: table, players: players } = dealCards(deck, createPlayers(numOfPlayers));
+
+    let roundIndex: number = 0;
+    
+    // Play till a player has no cards left
+    while(players.every(player => player.hand.length > 0) && roundIndex < numOfRounds){
+        // Let each player take a turn
+        for(let player of players){
+            // Remove the card from the current player's hand and add it to the table
+            let cardForTable = player.removeCardFromHand();
+            if(cardForTable){
+                table.push(cardForTable);
+            }
+        }
+        roundIndex++;
+    }
+
+    console.log(players[0].hand.length);
+    console.log(players[1].hand.length);
+    console.log(table.length);
 }
 
 function dealCards(deck: Card[], players: Player[]): { deck: Card[], players: Player[] } {
@@ -25,6 +42,15 @@ function dealCards(deck: Card[], players: Player[]): { deck: Card[], players: Pl
     }
 
     return { deck, players };
+}
+
+function createPlayers(numOfPlayers: number): Player[]{
+    let playersToAdd: Player[] = []
+    for(let i: number = 0; i < numOfPlayers; i++){
+        playersToAdd.push(new Player('Player ' + i));
+    }
+
+    return playersToAdd;
 }
 
 // Converted from Mike Bostock's JavaScript algorithm of the Fisher–Yates Shuffle - https://bost.ocks.org/mike/shuffle/
