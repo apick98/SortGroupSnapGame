@@ -1,10 +1,30 @@
 import Card from "./card";
 import Player from "./player";
+import PromptSync from "prompt-sync";
 
 function main(): void {
-    const numOfDecks: number = 1;
-    const numOfPlayers: number = 2;
-    const numOfRounds: number = 5;
+    const prompt = PromptSync();
+
+    let numOfDecks: number = 0;
+    while(isNaN(numOfDecks) || (numOfDecks < 1 || numOfDecks > 4 )){
+        numOfDecks = Number(prompt('Enter the number of decks (1 - 4): '));
+    }
+
+    let numOfPlayers: number = 0;
+    while(isNaN(numOfPlayers) || (numOfPlayers < 2 || numOfPlayers > 4 )){
+        numOfPlayers = Number(prompt('Enter the number of players (2 - 4): '));
+    }
+
+    let numOfRounds: number = 0;
+    while(isNaN(numOfRounds) || (numOfRounds < 1)){
+        numOfRounds = Number(prompt('Enter the max number of rounds (1+): '));
+    }
+
+    let snapMode: number = 99;
+    while(isNaN(snapMode) || ((snapMode > 0 && snapMode < 1) || snapMode > 1)){
+        snapMode = Number(prompt('Enter \'0\' for basic face-based snap or \'1\' for face and suit based snap: '));
+    }
+    
     
     let deck: Card[] = shuffleDeck(createDeck(numOfDecks));
     const { deck: table, players: players } = dealCards(deck, createPlayers(numOfPlayers));

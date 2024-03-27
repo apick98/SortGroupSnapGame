@@ -5,10 +5,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const card_1 = __importDefault(require("./card"));
 const player_1 = __importDefault(require("./player"));
+const prompt_sync_1 = __importDefault(require("prompt-sync"));
 function main() {
-    const numOfDecks = 1;
-    const numOfPlayers = 2;
-    const numOfRounds = 5;
+    const prompt = (0, prompt_sync_1.default)();
+    let numOfDecks = 0;
+    while (isNaN(numOfDecks) || (numOfDecks < 1 || numOfDecks > 4)) {
+        numOfDecks = Number(prompt('Enter the number of decks (1 - 4): '));
+    }
+    let numOfPlayers = 0;
+    while (isNaN(numOfPlayers) || (numOfPlayers < 2 || numOfPlayers > 4)) {
+        numOfPlayers = Number(prompt('Enter the number of players (2 - 4): '));
+    }
+    let numOfRounds = 0;
+    while (isNaN(numOfRounds) || (numOfRounds < 1)) {
+        numOfRounds = Number(prompt('Enter the max number of rounds (1+): '));
+    }
+    let snapMode = 99;
+    while (isNaN(snapMode) || ((snapMode > 0 && snapMode < 1) || snapMode > 1)) {
+        snapMode = Number(prompt('Enter \'0\' for basic face-based snap or \'1\' for face and suit based snap: '));
+    }
     let deck = shuffleDeck(createDeck(numOfDecks));
     const { deck: table, players: players } = dealCards(deck, createPlayers(numOfPlayers));
     let roundIndex = 0;
@@ -21,9 +36,6 @@ function main() {
         }
         roundIndex++;
     }
-    console.log(players[0].hand.length);
-    console.log(players[1].hand.length);
-    console.log(table.length);
 }
 function dealCards(deck, players) {
     const cardsToLeaveOnTable = deck.length % players.length;
