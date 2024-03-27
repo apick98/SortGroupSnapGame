@@ -5,44 +5,82 @@ import PromptSync from "prompt-sync";
 function main(): void {
     const prompt = PromptSync();
 
-    let numOfDecks: number = 0;
-    while(isNaN(numOfDecks) || (numOfDecks < 1 || numOfDecks > 4 )){
-        numOfDecks = Number(prompt('Enter the number of decks (1 - 4): '));
-    }
-
-    let numOfPlayers: number = 0;
-    while(isNaN(numOfPlayers) || (numOfPlayers < 2 || numOfPlayers > 4 )){
-        numOfPlayers = Number(prompt('Enter the number of players (2 - 4): '));
-    }
-
-    let numOfRounds: number = 0;
-    while(isNaN(numOfRounds) || (numOfRounds < 1)){
-        numOfRounds = Number(prompt('Enter the max number of rounds (1+): '));
-    }
-
-    let snapMode: number = 99;
-    while(isNaN(snapMode) || ((snapMode > 0 && snapMode < 1) || snapMode > 1)){
-        snapMode = Number(prompt('Enter \'0\' for basic face-based snap or \'1\' for face and suit based snap: '));
-    }
+    const numOfDecks: number = getUserInput("Enter the number of decks (1 - 4): ", 1, 4, prompt);
+    const numOfPlayers: number = getUserInput("Enter the number of players (2 - 4): ", 2, 4, prompt);
+    const numOfRounds: number = getUserInput("Enter the max number of rounds (1+): ", 1, Infinity, prompt);
+    const snapMode: number = getUserInput("Enter '0' for basic face-based snap or '1' for face and suit based snap: ", 0, 1, prompt);
     
-    
-    let deck: Card[] = shuffleDeck(createDeck(numOfDecks));
-    const { deck: table, players: players } = dealCards(deck, createPlayers(numOfPlayers));
+    let orderedDeck: Card[] = createDeck(numOfDecks);
+    let shuffledDeck: Card[] = shuffleDeck(orderedDeck);
+    let playersToAdd: Player[] = createPlayers(numOfPlayers);
+    let { deck: table, players: players } = dealCards(shuffledDeck, playersToAdd);
 
     let roundIndex: number = 0;
     
     // Play till a player has no cards left
     while(players.every(player => player.hand.length > 0) && roundIndex < numOfRounds){
         // Let each player take a turn
+        
         for(let player of players){
-            // Remove the card from the current player's hand and add it to the table
-            let cardForTable = player.removeCardFromHand();
-            if(cardForTable){
-                table.push(cardForTable);
+
+            if(table.length > 0){
+                console.log("Top card of table", table[0], player.name, player.hand[0], "has this many cards", player.hand.length);
+                // Flags when there is a snap
+                let snap: boolean = false;
+
+                // Check for snap based on player's game mode
+                if(snapMode == 0 && table[0].face == player.hand[0].face){
+                    snap = true;
+                }
+                else if(snapMode == 1 && (table[0].face == player.hand[0].face && table[0].suit == player.hand[0].suit)){
+                    snap = true;
+                }
+
+                // IF SNAP
+                if(snap){
+                    console.log("SNAP")
+                    // Put card used for snap to the back of a player's hand
+                    let cardToTheBack: Card | undefined = player.hand.shift();
+                    if (cardToTheBack) {
+                        player.addCardToHand(cardToTheBack);
+                    }
+                    
+                    // Take cards off the table and give to the player
+                    for(let card of table){
+                        player.addCardToHand(card)
+                    }
+                    table = [];
+                }
+                else {
+                // IF NO SNAP
+
+                    // Remove the card from the current player's hand and add it to the table
+                    let cardForTable = player.removeCardFromHand();
+                    if(cardForTable){
+                        table.push(cardForTable);
+                    }
+                }
+            }
+            else{
+                // IF NO SNAP
+
+                    // Remove the card from the current player's hand and add it to the table
+                    let cardForTable = player.removeCardFromHand();
+                    if(cardForTable){
+                        table.push(cardForTable);
+                    }
             }
         }
         roundIndex++;
     }
+}
+
+function getUserInput(promptMessage: string, min: number, max: number, prompt: any): number {
+    let input: number = NaN;
+    while(isNaN(input) || input < min || input > max) {
+        input = Number(prompt(promptMessage));
+    }
+    return input;
 }
 
 function dealCards(deck: Card[], players: Player[]): { deck: Card[], players: Player[] } {
@@ -50,7 +88,7 @@ function dealCards(deck: Card[], players: Player[]): { deck: Card[], players: Pl
 
     while (deck.length > cardsToLeaveOnTable) {
         for (let player of players) {
-            let card = deck.shift();
+            let card: Card | undefined = deck.shift();
             if (card) {
                 player.addCardToHand(card);
             }

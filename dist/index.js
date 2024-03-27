@@ -24,14 +24,46 @@ function main() {
     while (isNaN(snapMode) || ((snapMode > 0 && snapMode < 1) || snapMode > 1)) {
         snapMode = Number(prompt('Enter \'0\' for basic face-based snap or \'1\' for face and suit based snap: '));
     }
-    let deck = shuffleDeck(createDeck(numOfDecks));
-    const { deck: table, players: players } = dealCards(deck, createPlayers(numOfPlayers));
+    let orderedDeck = createDeck(numOfDecks);
+    let shuffledDeck = shuffleDeck(orderedDeck);
+    let playersToAdd = createPlayers(numOfPlayers);
+    let { deck: table, players: players } = dealCards(shuffledDeck, playersToAdd);
     let roundIndex = 0;
     while (players.every(player => player.hand.length > 0) && roundIndex < numOfRounds) {
         for (let player of players) {
-            let cardForTable = player.removeCardFromHand();
-            if (cardForTable) {
-                table.push(cardForTable);
+            if (table.length > 0) {
+                console.log("Top card of table", table[0], player.name, player.hand[0], "has this many cards", player.hand.length);
+                let snap = false;
+                if (snapMode == 0 && table[0].face == player.hand[0].face) {
+                    snap = true;
+                }
+                else if (snapMode == 1 && (table[0].face == player.hand[0].face && table[0].suit == player.hand[0].suit)) {
+                    snap = true;
+                }
+                if (snap) {
+                    console.log("SNAP");
+                    console.log("test");
+                    let cardToTheBack = player.hand.shift();
+                    if (cardToTheBack) {
+                        player.addCardToHand(cardToTheBack);
+                    }
+                    for (let card of table) {
+                        player.addCardToHand(card);
+                    }
+                    table = [];
+                }
+                else {
+                    let cardForTable = player.removeCardFromHand();
+                    if (cardForTable) {
+                        table.push(cardForTable);
+                    }
+                }
+            }
+            else {
+                let cardForTable = player.removeCardFromHand();
+                if (cardForTable) {
+                    table.push(cardForTable);
+                }
             }
         }
         roundIndex++;
