@@ -8,41 +8,25 @@ const player_1 = __importDefault(require("./player"));
 const prompt_sync_1 = __importDefault(require("prompt-sync"));
 function main() {
     const prompt = (0, prompt_sync_1.default)();
-    let numOfDecks = 0;
-    while (isNaN(numOfDecks) || (numOfDecks < 1 || numOfDecks > 4)) {
-        numOfDecks = Number(prompt('Enter the number of decks (1 - 4): '));
-    }
-    let numOfPlayers = 0;
-    while (isNaN(numOfPlayers) || (numOfPlayers < 2 || numOfPlayers > 4)) {
-        numOfPlayers = Number(prompt('Enter the number of players (2 - 4): '));
-    }
-    let numOfRounds = 0;
-    while (isNaN(numOfRounds) || (numOfRounds < 1)) {
-        numOfRounds = Number(prompt('Enter the max number of rounds (1+): '));
-    }
-    let snapMode = 99;
-    while (isNaN(snapMode) || ((snapMode > 0 && snapMode < 1) || snapMode > 1)) {
-        snapMode = Number(prompt('Enter \'0\' for basic face-based snap or \'1\' for face and suit based snap: '));
-    }
+    const numOfDecks = getUserInput("Enter the number of decks (1 - 4): ", 1, 4, prompt);
+    const numOfPlayers = getUserInput("Enter the number of players (2 - 4): ", 2, 4, prompt);
+    const numOfRounds = getUserInput("Enter the max number of rounds (1+): ", 1, Infinity, prompt);
+    const snapMode = getUserInput("Enter '0' for basic face-based snap or '1' for face and suit based snap: ", 0, 1, prompt);
     let orderedDeck = createDeck(numOfDecks);
     let shuffledDeck = shuffleDeck(orderedDeck);
     let playersToAdd = createPlayers(numOfPlayers);
     let { deck: table, players: players } = dealCards(shuffledDeck, playersToAdd);
+    playGame(players, table, numOfRounds, snapMode);
+}
+function playGame(players, table, numOfRounds, snapMode) {
     let roundIndex = 0;
     while (players.every(player => player.hand.length > 0) && roundIndex < numOfRounds) {
         for (let player of players) {
             if (table.length > 0) {
-                console.log("Top card of table", table[0], player.name, player.hand[0], "has this many cards", player.hand.length);
-                let snap = false;
-                if (snapMode == 0 && table[0].face == player.hand[0].face) {
-                    snap = true;
-                }
-                else if (snapMode == 1 && (table[0].face == player.hand[0].face && table[0].suit == player.hand[0].suit)) {
-                    snap = true;
-                }
+                console.log("Top card of table", table[0], player.name, player.hand[0]);
+                let snap = checkSnap(player, snapMode, table);
                 if (snap) {
                     console.log("SNAP");
-                    console.log("test");
                     let cardToTheBack = player.hand.shift();
                     if (cardToTheBack) {
                         player.addCardToHand(cardToTheBack);
@@ -60,14 +44,48 @@ function main() {
                 }
             }
             else {
+                console.log("No cards on the table");
                 let cardForTable = player.removeCardFromHand();
                 if (cardForTable) {
                     table.push(cardForTable);
                 }
             }
+            console.log(player.name + " has " + player.hand.length + " cards in their hand");
         }
         roundIndex++;
     }
+    displayWinner(players);
+}
+function displayWinner(players) {
+    let mostCardsPlayer = null;
+    let mostCardsCount = 0;
+    for (let player of players) {
+        if (player.hand.length > mostCardsCount) {
+            mostCardsCount = player.hand.length;
+            mostCardsPlayer = player;
+        }
+    }
+    if (mostCardsPlayer) {
+        console.log("The winner is: ", mostCardsPlayer.name, " with ", mostCardsCount, " cards");
+    }
+}
+function checkSnap(player, snapMode, table) {
+    if (snapMode == 0 && table[0].face == player.hand[0].face) {
+        return true;
+    }
+    else if (snapMode == 1 && (table[0].face == player.hand[0].face && table[0].suit == player.hand[0].suit)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+function getUserInput(promptMessage, min, max, prompt) {
+    let input = NaN;
+    while (isNaN(input) || input < min || input > max) {
+        input = Number(prompt(promptMessage));
+    }
+    return input;
 }
 function dealCards(deck, players) {
     const cardsToLeaveOnTable = deck.length % players.length;
