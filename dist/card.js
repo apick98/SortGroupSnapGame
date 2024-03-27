@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Card {
-    constructor(value, suit) {
-        this.value = value;
+    constructor(face, suit) {
+        this.face = face;
         this.suit = suit;
     }
 }

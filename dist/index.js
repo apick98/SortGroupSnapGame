@@ -57,12 +57,12 @@ function shuffleDeck(deck) {
 }
 function createDeck(numOfDecks = 1) {
     let suits = ['Clubs', 'Diamonds', 'Hearts', 'Spades'];
-    let values = ['Ace', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Jack', 'Queen', 'King'];
+    let faces = ['Ace', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Jack', 'Queen', 'King'];
     let deck = [];
     for (let i = 0; i < numOfDecks; i++) {
         for (let suit of suits) {
-            for (let value of values) {
-                deck.push(new card_1.default(value, suit));
+            for (let face of faces) {
+                deck.push(new card_1.default(face, suit));
             }
         }
     }

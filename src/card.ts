@@ -1,9 +1,9 @@
 class Card {
-    value: string
+    face: string
     suit: string
 
-    constructor(value: string, suit: string) {
-        this.value = value;
+    constructor(face: string, suit: string) {
+        this.face = face;
         this.suit = suit;
       }
 }

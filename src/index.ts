@@ -23,10 +23,6 @@ function main(): void {
         }
         roundIndex++;
     }
-
-    console.log(players[0].hand.length);
-    console.log(players[1].hand.length);
-    console.log(table.length);
 }
 
 function dealCards(deck: Card[], players: Player[]): { deck: Card[], players: Player[] } {
@@ -70,13 +66,13 @@ function shuffleDeck(deck: Card[]): Card[] {
 
 function createDeck(numOfDecks: number = 1): Card[] {
     let suits: string[] = ['Clubs', 'Diamonds', 'Hearts', 'Spades'];
-    let values: string[] = ['Ace','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Jack','Queen','King'];
+    let faces: string[] = ['Ace','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Jack','Queen','King'];
     let deck: Card[] = [];
 
     for (let i: number = 0; i < numOfDecks; i++){
        for (let suit of suits){
-            for (let value of values){
-                deck.push(new Card(value, suit));
+            for (let face of faces){
+                deck.push(new Card(face, suit));
             }
         } 
     }
